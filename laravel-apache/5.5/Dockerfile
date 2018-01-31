@@ -7,11 +7,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update -y \
     && apt dist-upgrade -y \
-    && apt install -y curl \
-    && apt install -y python-software-properties software-properties-common \
+    && apt install -y software-properties-common \
 
     && apt install -y apache2 \
-
     && LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php -y \
     && apt update -y \
 
@@ -30,18 +28,15 @@ RUN apt update -y \
     && a2enmod headers \
     && a2enmod ssl \
     && service apache2 restart \
+    && echo "<?php phpinfo();" | tee /var/www/html/info.php \
 
-    && echo "<?php phpinfo();" | tee /var/www/html/info.php
+    && wget -c -t inf https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
 
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    && wget -c -t inf https://deb.nodesource.com/setup_8.x | bash - \
+    && apt install -y nodejs \
 
-RUN curl -sL https://deb.nodesource.com/setup_8.x | bash - \
-    && apt install -y nodejs
-
-RUN apt-get -y autoremove && apt-get clean && apt-get autoclean && \
+    && apt-get -y autoremove && apt-get clean && apt-get autoclean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
-WORKDIR /var/www/html/
 
 EXPOSE 80 443
 
